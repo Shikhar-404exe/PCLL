@@ -1,0 +1,77 @@
+name: pcll_app
+description: Personal Cognitive Load Ledger - A productivity tracking tool using banking metaphor
+
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase (disabled for Windows due to SDK issues)
+  # firebase_core: ^2.24.2
+  # firebase_auth: ^4.16.0
+  # google_sign_in: ^6.2.1
+
+  # Local storage (offline-first)
+  sqflite: ^2.3.0
+  sqflite_common_ffi: ^2.3.0
+  path_provider: ^2.1.1
+  shared_preferences: ^2.2.2
+  share_plus: ^7.2.1
+
+  # Azure Cosmos DB
+  http: ^1.1.0
+  crypto: ^3.0.3
+
+  # Environment variables
+  flutter_dotenv: ^5.1.0
+
+  # State management
+  provider: ^6.1.1
+
+  # Charts and visualization
+  fl_chart: ^0.65.0
+
+  # Utilities
+  intl: ^0.18.1
+  uuid: ^4.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
+
+  # Assets
+  assets:
+    - .env
+
+  # Note: Using system fonts for now. To use custom fonts:
+  # 1. Download IBM Plex Mono and Inter fonts
+  # 2. Place them in assets/fonts/
+  # 3. Uncomment the fonts section below
+  #
+  # fonts:
+  #   - family: IBMPlexMono
+  #     fonts:
+  #       - asset: assets/fonts/IBMPlexMono-Regular.ttf
+  #       - asset: assets/fonts/IBMPlexMono-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/IBMPlexMono-SemiBold.ttf
+  #         weight: 600
+  #       - asset: assets/fonts/IBMPlexMono-Bold.ttf
+  #         weight: 700
+  #   - family: Inter
+  #     fonts:
+  #       - asset: assets/fonts/Inter-Regular.ttf
+  #       - asset: assets/fonts/Inter-Medium.ttf
+  #         weight: 500
+  #       - asset: assets/fonts/Inter-SemiBold.ttf
+  #         weight: 600

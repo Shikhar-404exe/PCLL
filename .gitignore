@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Flutter
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.metadata
+**/build/
+**/ios/Pods/
+**/android/.gradle/
+**/android/app/build/
+**/windows/flutter/ephemeral/
+
+# Logs
+*.log
+
+# Data
+data/*.db
+data/*.sqlite
+
+# IDE
+.vscode/
+.idea/
+
+# Environment
+.env
+venv/
