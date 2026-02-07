@@ -113,7 +113,7 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: PCLLSpacing.sm),
           _SettingsTile(
             icon: Icons.info_outline,
-            title: 'About PCLL',
+            title: 'About CogniVault',
             subtitle: 'Version 0.1.0 (prototype)',
             onTap: () => _showAbout(context),
           ),
@@ -403,13 +403,13 @@ class SettingsScreen extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(PCLLSpacing.borderRadius),
         ),
-        title: Text('About PCLL', style: PCLLTypography.headlineSmall),
+        title: Text('About CogniVault', style: PCLLTypography.headlineSmall),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Personal Cognitive Load Ledger',
+              'CogniVault - Personal Cognitive Load Ledger',
               style: PCLLTypography.labelMedium,
             ),
             const SizedBox(height: PCLLSpacing.md),

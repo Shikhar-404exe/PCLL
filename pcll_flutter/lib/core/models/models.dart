@@ -419,6 +419,8 @@ class Insight {
   final int ruleId;
   final String ruleName;
   final String message;
+  final String?
+      simpleExplanation; // Simple, plain-language explanation for beginners
   final int confidence;
   final Map<String, dynamic>? dataPoints;
 
@@ -427,6 +429,7 @@ class Insight {
     required this.ruleId,
     required this.ruleName,
     required this.message,
+    this.simpleExplanation,
     required this.confidence,
     this.dataPoints,
   });
@@ -451,6 +454,7 @@ class Insight {
         'rule_id': ruleId,
         'rule_name': ruleName,
         'message': message,
+        'simple_explanation': simpleExplanation,
         'confidence': confidence,
         'data_points': dataPoints,
       };
@@ -460,6 +464,7 @@ class Insight {
         ruleId: map['rule_id'] as int,
         ruleName: map['rule_name'] as String,
         message: map['message'] as String,
+        simpleExplanation: map['simple_explanation'] as String?,
         confidence: map['confidence'] as int,
         dataPoints: map['data_points'] as Map<String, dynamic>?,
       );

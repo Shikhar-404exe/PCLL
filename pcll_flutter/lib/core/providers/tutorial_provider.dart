@@ -1,6 +1,7 @@
 // Tutorial Provider
 
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 enum TutorialType {
   home,
@@ -51,9 +52,15 @@ class TutorialProvider extends ChangeNotifier {
   TutorialType? _activeTutorial;
   int _currentStep = 0;
   bool _tutorialsEnabled = true;
+  bool _isLoading = true;
+
+  TutorialProvider() {
+    _loadCompletedTutorials();
+  }
 
   // Getters
   bool get tutorialsEnabled => _tutorialsEnabled;
+  bool get isLoading => _isLoading;
   TutorialType? get activeTutorial => _activeTutorial;
   int get currentStep => _currentStep;
   bool get isShowingTutorial => _activeTutorial != null;
@@ -66,9 +73,9 @@ class TutorialProvider extends ChangeNotifier {
     TutorialType.home: [
       TutorialStep(
         id: 'home_welcome',
-        title: 'Welcome to PCLL',
+        title: 'Welcome to CogniVault',
         description:
-            'Your Personal Cognitive Load Ledger tracks mental energy like a bank account. Let\'s take a quick tour.',
+            'CogniVault is your Personal Cognitive Load Ledger that tracks mental energy like a bank account. Let\'s take a quick tour.',
         pointerPosition: PointerPosition.none,
         tooltipPosition: TooltipPosition.center,
       ),
@@ -209,6 +216,7 @@ class TutorialProvider extends ChangeNotifier {
 
   // Start a tutorial if not completed
   void startTutorialIfNeeded(TutorialType type) {
+    if (_isLoading) return; // Don't start if still loading preferences
     if (!_tutorialsEnabled) return;
     if (_completedTutorials.contains(type)) return;
     if (_activeTutorial != null) return;
@@ -250,6 +258,7 @@ class TutorialProvider extends ChangeNotifier {
   void completeTutorial() {
     if (_activeTutorial != null) {
       _completedTutorials.add(_activeTutorial!);
+      _saveCompletedTutorials();
       _activeTutorial = null;
       _currentStep = 0;
       notifyListeners();
@@ -260,6 +269,7 @@ class TutorialProvider extends ChangeNotifier {
   void skipTutorial() {
     if (_activeTutorial != null) {
       _completedTutorials.add(_activeTutorial!);
+      _saveCompletedTutorials();
       _activeTutorial = null;
       _currentStep = 0;
       notifyListeners();
@@ -269,6 +279,7 @@ class TutorialProvider extends ChangeNotifier {
   // Reset all tutorials
   void resetAllTutorials() {
     _completedTutorials.clear();
+    _saveCompletedTutorials();
     notifyListeners();
   }
 
@@ -276,5 +287,42 @@ class TutorialProvider extends ChangeNotifier {
   void setTutorialsEnabled(bool enabled) {
     _tutorialsEnabled = enabled;
     notifyListeners();
+  }
+
+  // Load completed tutorials from SharedPreferences
+  Future<void> _loadCompletedTutorials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final completedList = prefs.getStringList('completed_tutorials') ?? [];
+      _completedTutorials.clear();
+      for (final tutorialName in completedList) {
+        try {
+          final tutorialType = TutorialType.values.firstWhere(
+            (e) => e.toString() == tutorialName,
+          );
+          _completedTutorials.add(tutorialType);
+        } catch (e) {
+          debugPrint('Unknown tutorial type: $tutorialName');
+        }
+      }
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading completed tutorials: $e');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // Save completed tutorials to SharedPreferences
+  Future<void> _saveCompletedTutorials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final completedList =
+          _completedTutorials.map((tutorial) => tutorial.toString()).toList();
+      await prefs.setStringList('completed_tutorials', completedList);
+    } catch (e) {
+      debugPrint('Error saving completed tutorials: $e');
+    }
   }
 }

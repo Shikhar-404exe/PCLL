@@ -79,22 +79,15 @@ class BalanceDisplay extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.baseline,
               textBaseline: TextBaseline.alphabetic,
               children: [
-                Text(
-                  isDeficit ? '' : '+',
-                  style: TextStyle(
-                    fontFamily: PCLLTypography.monoFamily,
-                    fontSize: 72,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -2.0,
-                    height: 1.0,
-                    color: balanceColor,
-                  ),
-                ),
-                animate
-                    ? _AnimatedBalance(
-                        value: balance, color: balanceColor, fontSize: 72)
-                    : Text(
-                        balance.toStringAsFixed(1),
+                Flexible(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        isDeficit ? '' : '+',
                         style: TextStyle(
                           fontFamily: PCLLTypography.monoFamily,
                           fontSize: 72,
@@ -104,13 +97,30 @@ class BalanceDisplay extends StatelessWidget {
                           color: balanceColor,
                         ),
                       ),
-                const SizedBox(width: PCLLSpacing.smd),
-                Text(
-                  'CU',
-                  style: PCLLTypography.headlineMedium.copyWith(
-                    color: isDark
-                        ? PCLLColors.textTertiaryDark
-                        : PCLLColors.textTertiary,
+                      animate
+                          ? _AnimatedBalance(
+                              value: balance, color: balanceColor, fontSize: 72)
+                          : Text(
+                              balance.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontFamily: PCLLTypography.monoFamily,
+                                fontSize: 72,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: -2.0,
+                                height: 1.0,
+                                color: balanceColor,
+                              ),
+                            ),
+                      const SizedBox(width: PCLLSpacing.smd),
+                      Text(
+                        'CU',
+                        style: PCLLTypography.headlineMedium.copyWith(
+                          color: isDark
+                              ? PCLLColors.textTertiaryDark
+                              : PCLLColors.textTertiary,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -233,12 +243,15 @@ class _StateIndicator extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         border: Border.all(color: color.withOpacity(0.3)),
       ),
-      child: Text(
-        label,
-        style: PCLLTypography.labelSmall.copyWith(
-          color: color,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 1,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Text(
+          label,
+          style: PCLLTypography.labelSmall.copyWith(
+            color: color,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+          ),
         ),
       ),
     );

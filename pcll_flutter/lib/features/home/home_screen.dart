@@ -24,6 +24,7 @@ import '../../shared/widgets/ledger_card.dart';
 import '../../shared/widgets/calm_balance_chart.dart';
 import '../../shared/widgets/tutorial_overlay.dart';
 import '../../shared/widgets/background_patterns.dart';
+import '../../shared/widgets/ai_recommendations_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,9 +43,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Start tutorial after first frame
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TutorialProvider>().startTutorialIfNeeded(TutorialType.home);
+    // Start tutorial after first frame and after preferences are loaded
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final tutorialProvider = context.read<TutorialProvider>();
+      // Wait a bit for SharedPreferences to load
+      await Future.delayed(const Duration(milliseconds: 500));
+      tutorialProvider.startTutorialIfNeeded(TutorialType.home);
     });
   }
 
@@ -83,13 +87,21 @@ class _HomeScreenState extends State<HomeScreen> {
                       floating: true,
                       backgroundColor: Colors.transparent,
                       leading: _ProfileButton(),
-                      title: Text(
-                        'PCLL',
-                        style: TextStyle(
-                          color: isDark
-                              ? PCLLColors.textPrimaryDark
-                              : PCLLColors.woodDark,
-                        ),
+                      title: Consumer<AuthProvider>(
+                        builder: (context, auth, _) {
+                          final displayName = auth.isAuthenticated &&
+                                  auth.user?.displayName != null
+                              ? auth.user!.displayName!
+                              : 'Guest';
+                          return Text(
+                            displayName,
+                            style: TextStyle(
+                              color: isDark
+                                  ? PCLLColors.textPrimaryDark
+                                  : PCLLColors.woodDark,
+                            ),
+                          );
+                        },
                       ),
                       actions: [
                         _InsightsToggle(),
@@ -148,6 +160,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             _InsightCard(insight: ledger.todayInsight!),
                             const SizedBox(height: PCLLSpacing.lg),
                           ],
+
+                          // AI Recommendations
+                          _SectionHeader(title: 'RECOMMENDATIONS'),
+                          const SizedBox(height: PCLLSpacing.smd),
+                          const AIRecommendationsCard(),
+                          const SizedBox(height: PCLLSpacing.lg),
 
                           // Weekly Summary
                           if (ledger.weeklyTrends != null) ...[
@@ -844,13 +862,27 @@ class _InsightCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: PCLLSpacing.xs),
-                // Message
+                // Simple explanation (if available)
+                if (insight.simpleExplanation != null) ...[
+                  Text(
+                    insight.simpleExplanation!,
+                    style: PCLLTypography.bodyLarge.copyWith(
+                      color: isDark
+                          ? PCLLColors.textPrimaryDark
+                          : PCLLColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                      height: 1.3,
+                    ),
+                  ),
+                  const SizedBox(height: PCLLSpacing.xs),
+                ],
+                // Detailed message
                 Text(
                   insight.message,
                   style: PCLLTypography.bodyMedium.copyWith(
                     color: isDark
-                        ? PCLLColors.textPrimaryDark
-                        : PCLLColors.textPrimary,
+                        ? PCLLColors.textSecondaryDark
+                        : PCLLColors.textSecondary,
                     height: 1.4,
                   ),
                 ),

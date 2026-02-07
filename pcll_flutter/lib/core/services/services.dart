@@ -7,4 +7,5 @@ export 'database_service.dart';
 export 'insight_service.dart';
 export 'pattern_observation_service.dart';
 export 'preset_service.dart';
+export 'recommendations_service.dart';
 export 'sync_service.dart';

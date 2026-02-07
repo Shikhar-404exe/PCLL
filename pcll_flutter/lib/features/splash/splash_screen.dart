@@ -73,12 +73,24 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Logo/Title
-            Text(
-              'PCLL',
-              style: PCLLTypography.displayLarge.copyWith(letterSpacing: 4),
+            // Logo
+            Image.asset(
+              'logo.png',
+              width: 120,
+              height: 120,
+              errorBuilder: (context, error, stackTrace) => const Icon(
+                Icons.account_balance_wallet,
+                size: 80,
+                color: PCLLColors.accent,
+              ),
             ),
-            const SizedBox(height: PCLLSpacing.sm),
+            const SizedBox(height: PCLLSpacing.md),
+            // App Name
+            Text(
+              'CogniVault',
+              style: PCLLTypography.displayLarge.copyWith(letterSpacing: 2),
+            ),
+            const SizedBox(height: PCLLSpacing.xs),
             Text(
               'Personal Cognitive Load Ledger',
               style: PCLLTypography.bodyMedium.copyWith(

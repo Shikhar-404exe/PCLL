@@ -1,14 +1,17 @@
 // Azure Insights Service
+// DEMO MODE: Uses offline simulation instead of Azure API
 
 import 'dart:convert';
 import 'dart:io';
 import 'dart:async';
+import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/azure_models.dart';
 import '../models/models.dart';
 import '../config/env_config.dart';
 
 /// Service for optional Azure OpenAI integration
+/// DEMO MODE: Provides simulated responses for demonstrations
 class AzureInsightsService {
   // Singleton pattern
   static final AzureInsightsService _instance =
@@ -16,149 +19,175 @@ class AzureInsightsService {
   factory AzureInsightsService() => _instance;
   AzureInsightsService._internal();
 
-  // Configuration
-  AzureConfig? _config;
-  String? _apiKey;
-  bool _isEnabled = false;
+  final Random _random = Random();
 
-  // Cache to avoid redundant API calls
-  final Map<String, AzureInsightResponse> _cache = {};
-  static const Duration _cacheExpiry = Duration(hours: 24);
+  // DEMO MODE: Always available
+  bool _isEnabled = true;
 
   /// Initialize with configuration
   Future<void> initialize() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    // Check if feature is enabled (check both env and prefs)
-    final envEnabled = EnvConfig.azureEnabled;
-    final prefsEnabled = prefs.getBool('azure_insights_enabled');
-
-    // Use env value as default, but allow user override in prefs
-    _isEnabled = prefsEnabled ?? envEnabled;
-
-    if (!_isEnabled) return;
-
-    // Try to load from .env first, then fallback to SharedPreferences
-    String? endpoint = EnvConfig.azureEndpoint;
-    String? deployment = EnvConfig.azureDeployment;
-    String? apiKey = EnvConfig.azureApiKey;
-
-    // If not in .env, try SharedPreferences
-    if (endpoint.isEmpty || deployment.isEmpty || apiKey.isEmpty) {
-      endpoint = prefs.getString('azure_endpoint');
-      deployment = prefs.getString('azure_deployment');
-      apiKey = prefs.getString('azure_api_key');
-    }
-
-    if (endpoint != null &&
-        endpoint.isNotEmpty &&
-        deployment != null &&
-        deployment.isNotEmpty &&
-        apiKey != null &&
-        apiKey.isNotEmpty) {
-      _config = AzureConfig(
-        endpoint: endpoint,
-        deploymentName: deployment,
-      );
-      _apiKey = apiKey;
-    }
+    // DEMO MODE: Always enabled for demonstration
+    _isEnabled = true;
   }
 
-  /// Check if service is available
-  bool get isAvailable => _isEnabled && _config != null && _apiKey != null;
+  /// Check if service is available (always true for demo)
+  bool get isAvailable => true; // DEMO: Always available
 
-  /// Enable/disable the service
+  /// Enable/disable the service (always enabled in demo mode)
   Future<void> setEnabled(bool enabled) async {
-    _isEnabled = enabled;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('azure_insights_enabled', enabled);
+    // DEMO MODE: Always enabled
+    _isEnabled = true;
   }
 
-  /// Configure Azure connection
+  /// Configure Azure connection (not needed in demo mode)
   Future<void> configure({
     required String endpoint,
     required String deploymentName,
     required String apiKey,
   }) async {
-    _config = AzureConfig(
-      endpoint: endpoint,
-      deploymentName: deploymentName,
-    );
-    _apiKey = apiKey;
-
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('azure_endpoint', endpoint);
-    await prefs.setString('azure_deployment', deploymentName);
-    await prefs.setString('azure_api_key', apiKey);
+    // DEMO MODE: Configuration not needed
   }
 
-  /// Test connection
+  /// Test connection (always succeeds in demo mode)
   Future<bool> testConnection() async {
-    if (!isAvailable) return false;
-
-    try {
-      // Create minimal test summary
-      final testSummary = TrendSummaryForReflection(
-        periodStart: '2025-12-11',
-        periodEnd: '2025-12-18',
-        daysAnalyzed: 7,
-        avgBalance: 50.0,
-        trendDirection: 'STABLE',
-        dominantState: 'MODERATE',
-        contextSwitchingPct: 30,
-        decisionMakingPct: 25,
-        focusWorkPct: 25,
-        persistentLoadPct: 20,
-        avgRecoveryRatio: 0.4,
-        recoveryTrend: 'STABLE',
-        hasConsecutiveDeficits: false,
-        hasReducedCapacity: false,
-        showsRecoveryImprovement: false,
-      );
-
-      await _callAzureAPI(testSummary, bypassCache: true);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    // DEMO MODE: Simulate connection test with delay
+    await Future.delayed(Duration(milliseconds: 500 + _random.nextInt(500)));
+    return true;
   }
 
   /// Generate natural language reflection from trend summary
-  /// Returns cached result if available and fresh
+  /// DEMO MODE: Returns simulated responses
   Future<AzureInsightResponse?> getReflection(
     TrendSummaryForReflection summary, {
     bool forceRefresh = false,
   }) async {
-    // Check if service is available
-    if (!isAvailable) {
-      return null;
-    }
+    // DEMO MODE: Simulate API delay
+    await Future.delayed(Duration(milliseconds: 400 + _random.nextInt(600)));
 
-    // Check cache
-    final cacheKey = _getCacheKey(summary);
-    if (!forceRefresh && _cache.containsKey(cacheKey)) {
-      final cached = _cache[cacheKey]!;
-      final age = DateTime.now().difference(cached.timestamp);
-      if (age < _cacheExpiry) {
-        return AzureInsightResponse(
-          observations: cached.observations,
-          timestamp: cached.timestamp,
-          fromCache: true,
-        );
-      }
-    }
+    final observations = _generateSimulatedInsights(summary);
 
-    // Call Azure OpenAI
-    try {
-      final response = await _callAzureAPI(summary);
-      _cache[cacheKey] = response; // Cache result
-      return response;
-    } catch (e) {
-      // Fail gracefully - return null, caller handles fallback
-      return null;
-    }
+    return AzureInsightResponse(
+      observations: observations,
+      timestamp: DateTime.now(),
+      fromCache: false,
+    );
   }
 
+  /// DEMO MODE: Generate simulated AI insights based on trend data
+  List<String> _generateSimulatedInsights(TrendSummaryForReflection summary) {
+    List<String> insights = [];
+
+    // Opening based on average balance
+    if (summary.avgBalance >= 70) {
+      insights.add(
+          'Your cognitive capacity has been excellent this week, averaging ${summary.avgBalance.toStringAsFixed(0)} CU. You\'re operating in an optimal zone for complex work and decision-making.');
+    } else if (summary.avgBalance >= 40) {
+      insights.add(
+          'You\'ve maintained a moderate cognitive balance this week at ${summary.avgBalance.toStringAsFixed(0)} CU average. You\'re managing your workload reasonably well, though there\'s room to optimize.');
+    } else if (summary.avgBalance >= 0) {
+      insights.add(
+          'Your average balance of ${summary.avgBalance.toStringAsFixed(0)} CU indicates you\'re running on lower reserves. You\'re in a depleted state that requires attention and recovery.');
+    } else {
+      insights.add(
+          'Your cognitive account has been in deficit this week, averaging ${summary.avgBalance.toStringAsFixed(0)} CU. This is a clear signal that recovery needs to become your top priority.');
+    }
+
+    // Trend analysis
+    if (summary.trendDirection.contains('IMPROVING')) {
+      insights.add(
+          'The positive trend is encouraging - you\'re moving in the right direction. Whatever changes you\'ve made recently are working. Keep up these recovery-focused habits.');
+    } else if (summary.trendDirection.contains('DECLINING') ||
+        summary.trendDirection.contains('DETERIORATING')) {
+      insights.add(
+          'I\'m concerned about the declining trend in your cognitive balance. This pattern suggests your current approach isn\'t sustainable. It\'s time to reassess your commitments and recovery strategies.');
+    } else {
+      insights.add(
+          'Your balance has remained relatively stable. While consistency is valuable, consider whether you could push for gradual improvement or if you need to guard against slow decline.');
+    }
+
+    // Load category analysis
+    final highestCategory = _getHighestLoadCategory(summary);
+    switch (highestCategory) {
+      case 'context':
+        insights.add(
+            'Context switching accounts for ${summary.contextSwitchingPct.toStringAsFixed(0)}% of your cognitive load - that\'s significant. Each context switch fragments your attention. Try batching similar tasks and protecting focus blocks.');
+        break;
+      case 'decisions':
+        insights.add(
+            'Decision-making is consuming ${summary.decisionMakingPct.toStringAsFixed(0)}% of your cognitive budget. Consider which decisions could be deferred, delegated, or automated with clear criteria.');
+        break;
+      case 'focus':
+        insights.add(
+            'Deep focus work represents ${summary.focusWorkPct.toStringAsFixed(0)}% of your load. While valuable, extended focus drains CU quickly. Make sure you\'re scheduling adequate recovery between intense sessions.');
+        break;
+      case 'persistent':
+        insights.add(
+            'Persistent unresolved items are taking ${summary.persistentLoadPct.toStringAsFixed(0)}% of your cognitive capacity. These background drains compound daily. Prioritize either completing or consciously releasing these items.');
+        break;
+    }
+
+    // Recovery analysis
+    if (summary.avgRecoveryRatio < 0.3) {
+      insights.add(
+          'Your recovery ratio of ${(summary.avgRecoveryRatio * 100).toStringAsFixed(0)}% is critically low. You\'re not getting adequate rest relative to your load. This isn\'t sustainable - you need to prioritize sleep, breaks, and genuine downtime.');
+    } else if (summary.avgRecoveryRatio < 0.5) {
+      insights.add(
+          'Your recovery ratio of ${(summary.avgRecoveryRatio * 100).toStringAsFixed(0)}% suggests you\'re under-recovering. The quality or quantity of your rest periods needs improvement to match your cognitive demands.');
+    } else if (summary.avgRecoveryRatio >= 0.7 && summary.avgBalance < 50) {
+      insights.add(
+          'Your recovery ratio is good at ${(summary.avgRecoveryRatio * 100).toStringAsFixed(0)}%, yet your balance remains low. This suggests your baseline load might be too high. Consider reducing commitments or improving recovery quality.');
+    }
+
+    // Pattern-specific insights
+    if (summary.hasConsecutiveDeficits) {
+      insights.add(
+          'You\'ve experienced consecutive days in deficit - this is a red flag. Deficit accumulation has compounding effects on performance and wellbeing. Break this cycle with intentional recovery days.');
+    }
+
+    if (summary.hasReducedCapacity) {
+      insights.add(
+          'Starting days with reduced capacity (below 100 CU) means you\'re carrying cognitive debt forward. This makes you more vulnerable to deficit and reduces your buffer for unexpected demands.');
+    }
+
+    if (summary.recoveryTrend == 'IMPROVING' &&
+        summary.trendDirection.contains('IMPROVING')) {
+      insights.add(
+          'Both your balance and recovery are trending upward - excellent! You\'ve found a sustainable rhythm. Document what\'s working so you can maintain or return to these practices.');
+    } else if (summary.recoveryTrend == 'DECLINING') {
+      insights.add(
+          'Your recovery quality appears to be declining. Are you getting less sleep? More stress? Less effective breaks? Identify what\'s changed and address it before balance deteriorates further.');
+    }
+
+    // Add a closing recommendation
+    if (summary.avgBalance < 0) {
+      insights.add(
+          'Action needed: Schedule at least one full recovery day this week. Clear your calendar, minimize decisions, and prioritize activities that genuinely restore you. Your system needs a reset.');
+    } else if (summary.avgBalance < 40) {
+      insights.add(
+          'Next steps: Focus on incremental improvements. Add one 10-minute recovery break to each work block. Say no to one non-essential commitment. Small changes compound.');
+    } else if (summary.avgBalance < 70) {
+      insights.add(
+          'You\'re in a solid position to optimize. Experiment with one process improvement - maybe time-boxing decisions, or front-loading your hardest work when CU is highest.');
+    } else {
+      insights.add(
+          'You\'re operating at peak capacity. This is your opportunity to tackle challenging projects, mentor others, or build systems that will support you when CU is lower.');
+    }
+
+    return insights;
+  }
+
+  String _getHighestLoadCategory(TrendSummaryForReflection summary) {
+    final categories = {
+      'context': summary.contextSwitchingPct,
+      'decisions': summary.decisionMakingPct,
+      'focus': summary.focusWorkPct,
+      'persistent': summary.persistentLoadPct,
+    };
+
+    return categories.entries.reduce((a, b) => a.value > b.value ? a : b).key;
+  }
+
+  /* COMMENTED OUT: Azure API Call
   /// Internal: Call Azure OpenAI API
   Future<AzureInsightResponse> _callAzureAPI(
     TrendSummaryForReflection summary, {
@@ -245,6 +274,7 @@ class AzureInsightsService {
     await prefs.remove('azure_deployment');
     await prefs.remove('azure_api_key');
   }
+  */ // END COMMENTED OUT SECTION
 
   /// Build TrendSummaryForReflection from existing PCLL data structures
   /// This is the ONLY bridge between core system and Azure

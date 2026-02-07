@@ -107,7 +107,7 @@ class HowThisWorksScreen extends StatelessWidget {
             const Divider(),
             const SizedBox(height: PCLLSpacing.xl),
             _Section(
-              title: 'What PCLL Is',
+              title: 'What CogniVault Is',
               color: PCLLColors.positive,
               children: [
                 _BulletPoint('✓ A self-tracking tool for workload patterns',
@@ -126,7 +126,7 @@ class HowThisWorksScreen extends StatelessWidget {
             ),
             const SizedBox(height: PCLLSpacing.lg),
             _Section(
-              title: 'What PCLL Is NOT',
+              title: 'What CogniVault Is NOT',
               color: PCLLColors.negative,
               children: [
                 _BulletPoint('✗ A medical or diagnostic tool', negative: true),

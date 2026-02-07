@@ -77,7 +77,7 @@ class PCLLApp extends StatelessWidget {
       child: Consumer<SettingsProvider>(
         builder: (context, settings, _) {
           return MaterialApp(
-            title: 'PCLL',
+            title: 'CogniVault',
             debugShowCheckedModeBanner: false,
             theme: PCLLTheme.lightTheme.copyWith(
               textTheme: PCLLTheme.lightTheme.textTheme.apply(

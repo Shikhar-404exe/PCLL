@@ -1,5 +1,5 @@
-name: pcll_app
-description: Personal Cognitive Load Ledger - A productivity tracking tool using banking metaphor
+name: cognivault
+description: "CogniVault - Personal Cognitive Load Ledger: Track your mental energy like a bank account"
 
 publish_to: "none"
 
@@ -45,6 +45,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.1
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "logo.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "logo.png"
 
 flutter:
   uses-material-design: true
@@ -52,6 +60,7 @@ flutter:
   # Assets
   assets:
     - .env
+    - logo.png
 
   # Note: Using system fonts for now. To use custom fonts:
   # 1. Download IBM Plex Mono and Inter fonts

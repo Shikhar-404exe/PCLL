@@ -221,6 +221,8 @@ class InsightService {
             "Today's logged activities totaled ${entry.totalWithdrawals.toStringAsFixed(0)} CU "
             "in estimated cognitive demand, which exceeds the typical daily "
             "capacity of 100 CU.",
+        simpleExplanation:
+            "You did way more than usual today. That's a lot of mental work!",
         confidence: 85,
         dataPoints: {
           'total_withdrawals': entry.totalWithdrawals,
@@ -247,6 +249,8 @@ class InsightService {
               "Recovery activities (${entry.totalDeposits.toStringAsFixed(0)} CU) "
               "were ${(ratio * 100).toStringAsFixed(0)}% of withdrawal activities "
               "(${entry.totalWithdrawals.toStringAsFixed(0)} CU) today.",
+          simpleExplanation:
+              "You're not getting enough rest compared to how much energy you spent.",
           confidence: 80,
           dataPoints: {
             'deposits': entry.totalDeposits,
@@ -273,6 +277,8 @@ class InsightService {
             "Today's ledger closed at ${entry.closingBalance.toStringAsFixed(0)} CU, "
             "indicating logged withdrawals ${severity}exceeded "
             "available capacity plus recovery.",
+        simpleExplanation:
+            "You're running on empty. You used more energy than you had available.",
         confidence: 90,
         dataPoints: {
           'closing_balance': entry.closingBalance,
@@ -304,6 +310,8 @@ class InsightService {
         message: "The ledger shows $deficitDays days ending in deficit "
             "within the recent tracking period. This pattern indicates "
             "logged withdrawals have consistently exceeded recovery.",
+        simpleExplanation:
+            "You've been overdoing it for multiple days in a row. Time to slow down.",
         confidence: 85,
         dataPoints: {
           'deficit_days': deficitDays,
@@ -331,6 +339,8 @@ class InsightService {
               "Context switching accounted for ${(contextRatio * 100).toStringAsFixed(0)}% "
               "of today's logged cognitive demand "
               "(${entry.components.contextCost.toStringAsFixed(0)} CU).",
+          simpleExplanation:
+              "You're jumping between too many different things today.",
           confidence: 75,
           dataPoints: {
             'context_cost': entry.components.contextCost,
@@ -355,6 +365,7 @@ class InsightService {
         message: "Decision-making activities contributed "
             "${entry.components.decisionCost.toStringAsFixed(0)} CU to today's ledger, "
             "indicating a high volume of deliberative choices were logged.",
+        simpleExplanation: "You had to make a lot of tough decisions today.",
         confidence: 75,
         dataPoints: {
           'decision_cost': entry.components.decisionCost,
@@ -377,6 +388,8 @@ class InsightService {
         message:
             "Unresolved items contributed ${entry.components.passiveDrain.toStringAsFixed(0)} CU "
             "of passive drain to today's ledger balance.",
+        simpleExplanation:
+            "Unfinished tasks are draining your energy in the background.",
         confidence: 70,
         dataPoints: {
           'passive_drain': entry.components.passiveDrain,
@@ -402,6 +415,8 @@ class InsightService {
         message:
             "Today's balance (${entry.closingBalance.toStringAsFixed(0)} CU) shows recovery "
             "from yesterday's deficit (${prevEntry.closingBalance.toStringAsFixed(0)} CU).",
+        simpleExplanation:
+            "Great job! You bounced back from yesterday's overload.",
         confidence: 85,
         dataPoints: {
           'today_balance': entry.closingBalance,
@@ -429,6 +444,8 @@ class InsightService {
             "The past ${trends.daysAnalyzed} days show a consistent pattern "
             "with average closing balance of ${trends.avgClosingBalance.toStringAsFixed(0)} CU "
             "and no deficit days.",
+        simpleExplanation:
+            "You've found a good rhythm! Keep doing what you're doing.",
         confidence: 80,
         dataPoints: {
           'avg_balance': trends.avgClosingBalance,
@@ -454,6 +471,8 @@ class InsightService {
         ruleName: 'TREND_CHANGE',
         message: "Balance trend over ${trends.daysAnalyzed} days shows "
             "improvement (slope: +${trends.balanceSlope.toStringAsFixed(1)} CU/day).",
+        simpleExplanation:
+            "Things are getting better! You're managing your energy well.",
         confidence: 75,
         dataPoints: {
           'slope': trends.balanceSlope,
@@ -470,6 +489,8 @@ class InsightService {
         ruleName: 'TREND_CHANGE',
         message: "Balance trend over ${trends.daysAnalyzed} days shows "
             "decline (slope: ${trends.balanceSlope.toStringAsFixed(1)} CU/day).",
+        simpleExplanation:
+            "Your energy levels are dropping day by day. Time to prioritize rest.",
         confidence: 75,
         dataPoints: {
           'slope': trends.balanceSlope,
@@ -510,6 +531,8 @@ class InsightService {
               "forward each day. ${entry.carryForwardDebt.toStringAsFixed(1)} CU "
               "will carry to tomorrow. This accumulating load is a key "
               "contributor to sustained deficit over time.",
+          simpleExplanation:
+              "You're carrying yesterday's stress into today and it's building up.",
           confidence: 90,
           dataPoints: {
             'today_carry_forward': entry.carryForwardDebt,
@@ -543,6 +566,8 @@ class InsightService {
             "is ${(ratio * 100).toStringAsFixed(0)}% of immediate load "
             "(${entry.immediateLoad.toStringAsFixed(0)} CU). "
             "Consider closing open loops or resolving deferred decisions to reduce ongoing drain.",
+        simpleExplanation:
+            "Old worries are taking up as much energy as your current tasks.",
         confidence: 85,
         dataPoints: {
           'persistent_load': entry.persistentDebt,
@@ -577,6 +602,8 @@ class InsightService {
             "(${severity}reduced from full 100 CU capacity). "
             "Yesterday's deficit of ${(reduction / 0.4).toStringAsFixed(0)} CU "
             "carried forward at 40%, reducing today's starting resources.",
+        simpleExplanation:
+            "You didn't fully reset overnight. Your sleep or recovery wasn't enough to get back to 100%.",
         confidence: 95,
         dataPoints: {
           'opening_balance': entry.openingBalance,
@@ -615,6 +642,8 @@ class InsightService {
             "Despite ending at ${yesterday.closingBalance.toStringAsFixed(0)} CU, "
             "effective recovery reset today to full capacity. "
             "Current balance: ${entry.closingBalance.toStringAsFixed(0)} CU.",
+        simpleExplanation:
+            "You're fully recharged! Yesterday's drain is behind you now.",
         confidence: 90,
         dataPoints: {
           'yesterday_closing': yesterday.closingBalance,
@@ -664,6 +693,8 @@ class InsightService {
               "due to deficit state. When in cognitive deficit, recovery is harder - "
               "this is why prevention matters more than cure. "
               "Sustained recovery over multiple days is needed.",
+          simpleExplanation:
+              "You're too tired to rest properly. Recovery doesn't work well when you're already drained.",
           confidence: 85,
           dataPoints: {
             'closing_balance': entry.closingBalance,
@@ -694,6 +725,8 @@ class InsightService {
         message: "Over ${trends.daysAnalyzed} days, recovery activities "
             "(${trends.avgDeposits.toStringAsFixed(0)} CU/day avg) were ${(trends.recoveryRatio * 100).toStringAsFixed(0)}% "
             "of withdrawal activities (${trends.avgWithdrawals.toStringAsFixed(0)} CU/day avg).",
+        simpleExplanation:
+            "This week, you haven't been resting enough compared to how hard you're working.",
         confidence: 80,
         dataPoints: {
           'recovery_ratio': trends.recoveryRatio,
